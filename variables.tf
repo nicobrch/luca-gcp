@@ -34,7 +34,9 @@ variable "luca_github_actions_sa_roles" {
     "roles/run.admin",
     "roles/iam.serviceAccountUser",
     "roles/iam.serviceAccountTokenCreator",
+    "roles/iam.serviceAccounts.getAccessToken",
     "roles/artifactregistry.writer",
+    "roles/artifactregistry.repositories.uploadArtifacts",
     "roles/secretmanager.secretAccessor",
     "roles/secretmanager.secretVersionAdder",
   ]
