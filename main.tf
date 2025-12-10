@@ -5,8 +5,8 @@ provider "google" {
 
 # Enable the Firestore API automatically
 resource "google_project_service" "firestore" {
-  project = var.project_id
-  service = "firestore.googleapis.com"
+  project            = var.project_id
+  service            = "firestore.googleapis.com"
   disable_on_destroy = false
 }
 
