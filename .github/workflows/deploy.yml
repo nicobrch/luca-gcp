@@ -1,0 +1,58 @@
+name: "Terraform Infrastructure"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+  WIF_SERVICE_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Authenticate to Google Cloud using WIF
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: '${{ env.WIF_PROVIDER }}'
+          service_account: '${{ env.WIF_SERVICE_ACCOUNT }}'
+
+      # Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Initialize Terraform (downloads providers and connects to GCS backend)
+      - name: Terraform Init
+        run: terraform init
+
+      # Check for formatting errors
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      # Generates an execution plan for Pull Requests
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -var="project_id=${{ env.PROJECT_ID }}"
+
+      # Applies the changes ONLY on push to main
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -var="project_id=${{ env.PROJECT_ID }}"
