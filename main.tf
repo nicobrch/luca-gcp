@@ -67,7 +67,7 @@ resource "google_artifact_registry_repository" "repository" {
   repository_id = var.luca_artifact_registry_name
   description   = "Artifact Registry for Cloud Run service images"
   format        = "DOCKER"
-  mode          = "STANDARD"
+  mode          = "STANDARD_REPOSITORY"
 
   depends_on = [google_project_service.artifact_registry]
 }
