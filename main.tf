@@ -39,6 +39,13 @@ resource "google_project_service" "artifact_registry" {
   disable_on_destroy = false
 }
 
+# Enable IAM API
+resource "google_project_service" "iam" {
+  project            = var.project_id
+  service            = "iam.googleapis.com"
+  disable_on_destroy = false
+}
+
 # -- Services --
 
 # Create the Firestore Native Database
