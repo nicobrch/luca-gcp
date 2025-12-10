@@ -33,6 +33,7 @@ variable "luca_github_actions_sa_roles" {
   default = [
     "roles/run.admin",
     "roles/iam.serviceAccountUser",
+    "roles/iam.serviceAccountTokenCreator",
     "roles/artifactregistry.writer",
     "roles/secretmanager.secretAccessor",
     "roles/secretmanager.secretVersionAdder",

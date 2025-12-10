@@ -46,6 +46,13 @@ resource "google_project_service" "iam" {
   disable_on_destroy = false
 }
 
+# Enable the IAM Service Account Credentials API
+resource "google_project_service" "iam_credentials" {
+  project            = var.project_id
+  service            = "iamcredentials.googleapis.com"
+  disable_on_destroy = false
+}
+
 # -- Services --
 
 # Create the Firestore Native Database
