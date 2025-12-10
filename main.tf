@@ -62,12 +62,12 @@ resource "google_firestore_database" "database" {
 
 # Create the Luca's Artifact Registry Repository
 resource "google_artifact_registry_repository" "repository" {
-  provider     = google
-  location     = var.region
+  provider      = google
+  location      = var.region
   repository_id = var.luca_artifact_registry_name
-  description  = "Artifact Registry for Cloud Run service images"
-  format       = "DOCKER"
-  mode         = "STANDARD"
+  description   = "Artifact Registry for Cloud Run service images"
+  format        = "DOCKER"
+  mode          = "STANDARD"
 
   depends_on = [google_project_service.artifact_registry]
 }
