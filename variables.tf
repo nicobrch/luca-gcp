@@ -39,3 +39,9 @@ variable "luca_github_actions_sa_roles" {
     "roles/secretmanager.secretVersionAdder",
   ]
 }
+
+variable "github_repositories" {
+  description = "List of GitHub repositories allowed to impersonate the service account (format: owner/repo)"
+  type        = list(string)
+  default     = ["nicobrch/luca", "nicobrch/luca-gcp"]
+}

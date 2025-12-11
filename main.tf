@@ -104,3 +104,37 @@ resource "google_project_iam_member" "github_actions_sa_roles" {
   role    = each.value
   member  = "serviceAccount:${google_service_account.github_actions_sa.email}"
 }
+
+# -- Workload Identity Federation --
+
+# Create the Workload Identity Pool
+resource "google_iam_workload_identity_pool" "github_pool" {
+  workload_identity_pool_id = "github-pool"
+  display_name              = "GitHub Pool"
+  description               = "Identity pool for GitHub Actions"
+  disabled                  = false
+}
+
+# Create the Workload Identity Provider
+resource "google_iam_workload_identity_pool_provider" "github_provider" {
+  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
+  workload_identity_pool_provider_id = "github-provider"
+  display_name                       = "GitHub Provider"
+  description                        = "OIDC identity provider for GitHub Actions"
+  attribute_mapping = {
+    "google.subject"       = "assertion.sub"
+    "attribute.actor"      = "assertion.actor"
+    "attribute.repository" = "assertion.repository"
+  }
+  oidc {
+    issuer_uri = "https://token.actions.githubusercontent.com"
+  }
+}
+
+# Grant the GitHub repositories permission to impersonate the Service Account
+resource "google_service_account_iam_member" "workload_identity_user" {
+  for_each           = toset(var.github_repositories)
+  service_account_id = google_service_account.github_actions_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${each.value}"
+}
