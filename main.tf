@@ -107,15 +107,7 @@ resource "google_project_iam_member" "github_actions_sa_roles" {
 
 # -- Workload Identity Federation --
 
-# Reference the existing Workload Identity Pool
-data "google_iam_workload_identity_pool" "github_pool" {
-  workload_identity_pool_id = "github-pool"
-}
-
-# Reference the existing Workload Identity Provider
-data "google_iam_workload_identity_pool_provider" "github_provider" {
-  workload_identity_pool_id          = data.google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
-  workload_identity_pool_provider_id = "github-provider"
+data "google_project" "project" {
 }
 
 # Grant the GitHub repositories permission to impersonate the Service Account
@@ -123,5 +115,5 @@ resource "google_service_account_iam_member" "workload_identity_user" {
   for_each           = toset(var.github_repositories)
   service_account_id = google_service_account.github_actions_sa.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${data.google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${each.value}"
+  member             = "principalSet://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/github-pool/attribute.repository/${each.value}"
 }
